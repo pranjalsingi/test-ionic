@@ -45,7 +45,7 @@ app.controller('GroupJoinedController', ['$scope','$http','$state', function($sc
 
 	$scope.group = $state.params.obj;
 	$scope.lost = false;
-	console.dir($scope.group);
+	//console.dir($scope.group);
 	//$scope.group = $rootScope.group;
 	$scope.updateLoc = setInterval(function(){ $scope.myTimer(); }, 3000);
 
@@ -62,17 +62,23 @@ app.controller('GroupJoinedController', ['$scope','$http','$state', function($sc
 				}).then(function successCallback(response) {
 				    // this callback will be called asynchronously
 				    // when the response is available
-				    console.log(response);
-				    if(response.data.lostList.length != 0){
+				    //console.log(response);
+				    if(response.data.lostList.length > 0){
 				    	navigator.vibrate(100);
 				    	$scope.lost = true;
+				    	if(response.data.lostList.length > 2){
+				    		$scope.message = response.data.lostList.join(', ') + " are lost";
+				    	}
+				    	else{
+				    		$scope.message = response.data.lostList.join(', ') + " is lost";
+				    	}
 				    	//alert("Got in!");
 				    }
 				  }, function errorCallback(response) {
 				    // called asynchronously if an error occurs
 				    // or server returns response with an error status.
-				    console.log("in error");
-				    console.log(response);
+				    //console.log("in error");
+				    //console.log(response);
 				    clearInterval($scope.updateLoc);
 					$state.go('home');
 				  });
@@ -137,6 +143,7 @@ app.controller('CreateGroupController', ['$scope','$http','$state', function($sc
 app.controller('EndGroupController', ['$scope','$http','$state', function($scope, $http, $state){
 
 	$scope.group = $state.params.obj;
+	$scope.lost = false;
 
 	$scope.updateLoc = setInterval(function(){ $scope.myTimer(); }, 3000);
 
@@ -154,15 +161,22 @@ app.controller('EndGroupController', ['$scope','$http','$state', function($scope
 				    // this callback will be called asynchronously
 				    // when the response is available
 				    console.log(response);
-				    if(response.data.lostList.length != 0){
-				    	//navigator.vibrate(100);
+				    if(response.data.lostList.length > 0){
+				    	navigator.vibrate(100);
+				    	$scope.lost = true;
+				    	if(response.data.lostList.length > 2){
+				    		$scope.message = response.data.lostList.join(', ') + " are lost";
+				    	}
+				    	else{
+				    		$scope.message = response.data.lostList.join(', ') + " is lost";
+				    	}
 				    	//alert("Got in!");
 				    }
 				  }, function errorCallback(response) {
 				    // called asynchronously if an error occurs
 				    // or server returns response with an error status.
-				    console.log("in error");
-				    console.log(response);
+				    //console.log("in error");
+				    //console.log(response);
 				  });
 
 		      	console.log('Latitude: '          + position.coords.latitude          + '\n' +

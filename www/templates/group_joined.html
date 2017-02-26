@@ -3,10 +3,10 @@
     <div class="padding">
       <h1>You joined group</h1>
     </div>
-    <div class="card" style="background-color: red;" ng-show="lost">
-      <div class="item item-text-wrap button-assertive">
-        <p></p>
-      </div>
+    <div class="padding" ng-show="lost">
+      <button class="button button-full button-assertive">
+        {{ message }}
+      </button>
     </div>
   </ion-content>
 </ion-view>
