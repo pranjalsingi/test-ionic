@@ -17,11 +17,13 @@ app.controller('JoinGroupController', ['$scope','$http', '$state', function($sco
 
 	   		$http({
 			  method: 'POST',
-			  url: 'http://23.96.125.188:5000/joinGroup',
-			  data: { "groupCode" : $scope.group.groupCode, "dispName" : $scope.group.dispName, "loc" : [position.coords.latitude, position.coords.longitude] }
+			  url: 'http://23.96.125.188:5000/joinGroup/'+$scope.group.groupCode,
+			  data: { "dispName" : $scope.group.dispName, "loc" : [position.coords.latitude, position.coords.longitude] }
 			}).then(function successCallback(response) {
 			    // this callback will be called asynchronously
 			    // when the response is available
+			    //$rootScope.group = angular.copy($scope.group);
+			    console.dir($scope.group);
 			    $state.go('joined', { obj : $scope.group });
 			  }, function errorCallback(response) {
 			    // called asynchronously if an error occurs
@@ -42,11 +44,12 @@ app.controller('JoinGroupController', ['$scope','$http', '$state', function($sco
 app.controller('GroupJoinedController', ['$scope','$http','$state', function($scope, $http, $state){
 
 	$scope.group = $state.params.obj;
-
+	$scope.lost = false;
+	console.dir($scope.group);
+	//$scope.group = $rootScope.group;
 	$scope.updateLoc = setInterval(function(){ $scope.myTimer(); }, 3000);
 
 	$scope.myTimer = function(){
-		console.log("Here");
 		var options = {};
 
 	   	var watchID = navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
@@ -54,17 +57,24 @@ app.controller('GroupJoinedController', ['$scope','$http','$state', function($sc
 	   	function onSuccess(position) {
 			$http({
 				  method: 'POST',
-				  url: 'http://104.131.4.157:443/'
-				  //data: { "groupCode" : "GWGT", "dispName" : "nima" ,"loc" : [position.coords.latitude, position.coords.longitude] }
+				  url: 'http://23.96.125.188:5000/updateLoc',
+				  data: { "groupCode" : $scope.group.groupCode, "dispName" : $scope.group.dispName ,"loc" : [position.coords.latitude, position.coords.longitude] }
 				}).then(function successCallback(response) {
 				    // this callback will be called asynchronously
 				    // when the response is available
 				    console.log(response);
+				    if(response.data.lostList.length != 0){
+				    	navigator.vibrate(100);
+				    	$scope.lost = true;
+				    	//alert("Got in!");
+				    }
 				  }, function errorCallback(response) {
 				    // called asynchronously if an error occurs
 				    // or server returns response with an error status.
 				    console.log("in error");
 				    console.log(response);
+				    clearInterval($scope.updateLoc);
+					$state.go('home');
 				  });
 
 		      	console.log('Latitude: '          + position.coords.latitude          + '\n' +
@@ -77,8 +87,7 @@ app.controller('GroupJoinedController', ['$scope','$http','$state', function($sc
 	}
 
 	$scope.stopUpdateLoc = function(){
-		clearInterval($scope.updateLoc);
-		$state.go('home');
+		
 	}
 	
 }]);
@@ -139,12 +148,16 @@ app.controller('EndGroupController', ['$scope','$http','$state', function($scope
 	   	function onSuccess(position) {
 			$http({
 				  method: 'POST',
-				  url: 'http://104.131.4.157:443/'
-				  //data: { "groupCode" : "GWGT", "dispName" : "nima" ,"loc" : [position.coords.latitude, position.coords.longitude] }
+				  url: 'http://23.96.125.188:5000/updateLoc',
+				  data: { "groupCode" : $scope.group.groupCode, "dispName" : $scope.group.dispName ,"loc" : [position.coords.latitude, position.coords.longitude] }
 				}).then(function successCallback(response) {
 				    // this callback will be called asynchronously
 				    // when the response is available
 				    console.log(response);
+				    if(response.data.lostList.length != 0){
+				    	//navigator.vibrate(100);
+				    	//alert("Got in!");
+				    }
 				  }, function errorCallback(response) {
 				    // called asynchronously if an error occurs
 				    // or server returns response with an error status.
