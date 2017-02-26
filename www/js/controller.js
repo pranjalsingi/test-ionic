@@ -39,9 +39,47 @@ app.controller('JoinGroupController', ['$scope','$http', '$state', function($sco
 	}
 }]);
 
-app.controller('GroupJoinedController', ['$scope', function($scope){
+app.controller('GroupJoinedController', ['$scope','$http','$state', function($scope, $http, $state){
 
+	$scope.group = $state.params.obj;
 
+	$scope.updateLoc = setInterval(function(){ $scope.myTimer(); }, 3000);
+
+	$scope.myTimer = function(){
+		console.log("Here");
+		var options = {};
+
+	   	var watchID = navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
+
+	   	function onSuccess(position) {
+			$http({
+				  method: 'POST',
+				  url: 'http://104.131.4.157:443/'
+				  //data: { "groupCode" : "GWGT", "dispName" : "nima" ,"loc" : [position.coords.latitude, position.coords.longitude] }
+				}).then(function successCallback(response) {
+				    // this callback will be called asynchronously
+				    // when the response is available
+				    console.log(response);
+				  }, function errorCallback(response) {
+				    // called asynchronously if an error occurs
+				    // or server returns response with an error status.
+				    console.log("in error");
+				    console.log(response);
+				  });
+
+		      	console.log('Latitude: '          + position.coords.latitude          + '\n' +
+		         'Longitude: '         + position.coords.longitude         + '\n');
+		   	};
+
+	   function onError(error) {
+	      alert('code: '    + error.code    + '\n' +'message: ' + error.message + '\n');
+	   }
+	}
+
+	$scope.stopUpdateLoc = function(){
+		clearInterval($scope.updateLoc);
+		$state.go('home');
+	}
 	
 }]);
 
@@ -90,13 +128,42 @@ app.controller('CreateGroupController', ['$scope','$http','$state', function($sc
 app.controller('EndGroupController', ['$scope','$http','$state', function($scope, $http, $state){
 
 	$scope.group = $state.params.obj;
-	console.log($scope.group);
 
-	$scope.test = function(){
-		alert("Hey");
+	$scope.updateLoc = setInterval(function(){ $scope.myTimer(); }, 3000);
+
+	$scope.myTimer = function(){
+		var options = {};
+
+	   	var watchID = navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
+
+	   	function onSuccess(position) {
+			$http({
+				  method: 'POST',
+				  url: 'http://104.131.4.157:443/'
+				  //data: { "groupCode" : "GWGT", "dispName" : "nima" ,"loc" : [position.coords.latitude, position.coords.longitude] }
+				}).then(function successCallback(response) {
+				    // this callback will be called asynchronously
+				    // when the response is available
+				    console.log(response);
+				  }, function errorCallback(response) {
+				    // called asynchronously if an error occurs
+				    // or server returns response with an error status.
+				    console.log("in error");
+				    console.log(response);
+				  });
+
+		      	console.log('Latitude: '          + position.coords.latitude          + '\n' +
+		         'Longitude: '         + position.coords.longitude         + '\n');
+		   	};
+
+	   function onError(error) {
+	      alert('code: '    + error.code    + '\n' +'message: ' + error.message + '\n');
+	   }
 	}
 
+
 	$scope.destroy = function(){
+
 		$http({
 		  method: 'GET',
 		  url: 'http://23.96.125.188:5000/groupEnd/'+$scope.group.groupCode
@@ -104,6 +171,7 @@ app.controller('EndGroupController', ['$scope','$http','$state', function($scope
 		    // this callback will be called asynchronously
 		    // when the response is available
 		    console.log("in success");
+		    clearInterval($scope.updateLoc);
 		    $state.go('home');
 		  }, function errorCallback(response) {
 		    // called asynchronously if an error occurs
