@@ -2,29 +2,6 @@ var app = angular.module('wander');
 
 app.controller('GeoController', ['$scope','$http', function($scope, $http){
 
-	$scope.groupName = "";
-	$scope.dispName = "";
-	$scope.triggerDist = "10ft";
-
-	$scope.test = function(){
-		console.log($scope.groupName);
-		console.log($scope.dispName);
-		console.log($scope.triggerDist);
-	}
-
-	$http({
-		  method: 'POST',
-		  url: 'http://23.96.125.188:5000/createGroup',
-		  data: {"lat" : position.coords.latitude, "lon" : position.coords.longitude }
-		}).then(function successCallback(response) {
-		    // this callback will be called asynchronously
-		    // when the response is available
-		    console.log(response);
-		  }, function errorCallback(response) {
-		    // called asynchronously if an error occurs
-		    // or server returns response with an error status.
-		  });
-
 	$scope.getPosition = function() {
 
 	   var options = {};/*{
@@ -39,8 +16,8 @@ app.controller('GeoController', ['$scope','$http', function($scope, $http){
 
 	   		$http({
 			  method: 'POST',
-			  url: 'http://23.96.125.188:5000/',
-			  data: {"lat" : position.coords.latitude, "lon" : position.coords.longitude }
+			  url: 'http://23.96.125.188:5000/updateLoc',
+			  data: { "groupCode" : "K7UN", "dispName" : "sdfs" ,"loc" : [position.coords.latitude, position.coords.longitude] }
 			}).then(function successCallback(response) {
 			    // this callback will be called asynchronously
 			    // when the response is available
@@ -48,6 +25,8 @@ app.controller('GeoController', ['$scope','$http', function($scope, $http){
 			  }, function errorCallback(response) {
 			    // called asynchronously if an error occurs
 			    // or server returns response with an error status.
+			    console.log("in error");
+			    console.log(response);
 			  });
 
 	      	console.log('Latitude: '          + position.coords.latitude          + '\n' +
@@ -61,6 +40,8 @@ app.controller('GeoController', ['$scope','$http', function($scope, $http){
 }]);
 
 app.controller('GroupJoinedController', ['$scope', function($scope){
+
+
 	
 }]);
 
@@ -97,7 +78,28 @@ app.controller('CreateGroupController', ['$scope','$http','$state', function($sc
 
 app.controller('EndGroupController', ['$scope','$http','$state', function($scope, $http, $state){
 
-	console.log($state.params.obj);
+	$scope.group = $state.params.obj;
+	console.log($scope.group);
 
+	$scope.test = function(){
+		alert("Hey");
+	}
+
+	$scope.destroy = function(){
+		$http({
+		  method: 'GET',
+		  url: 'http://23.96.125.188:5000/groupEnd/'+$scope.group.groupCode
+		}).then(function successCallback(response) {
+		    // this callback will be called asynchronously
+		    // when the response is available
+		    console.log("in success");
+		    $state.go('newgroup');
+		  }, function errorCallback(response) {
+		    // called asynchronously if an error occurs
+		    // or server returns response with an error status.
+		    console.log("in error");
+		    console.log(response);
+		  });
+	}
 	
 }]);
