@@ -1,14 +1,15 @@
 var app = angular.module('wander');
 
-app.controller('GeoController', ['$scope','$http', function($scope, $http){
+app.controller('JoinGroupController', ['$scope','$http', '$state', function($scope, $http, $state){
 
-	$scope.getPosition = function() {
+	$scope.group = {
+		groupCode: "",
+		dispName: ""
+	};
 
-	   var options = {};/*{
-	      maximumAge: 3600000,
-	      timeout: 3000,
-	      enableHighAccuracy: false
-	   }*/
+	$scope.join = function() {
+
+	   var options = {};
 
 	   var watchID = navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
 
@@ -16,17 +17,16 @@ app.controller('GeoController', ['$scope','$http', function($scope, $http){
 
 	   		$http({
 			  method: 'POST',
-			  url: 'http://23.96.125.188:5000/updateLoc',
-			  data: { "groupCode" : "K7UN", "dispName" : "sdfs" ,"loc" : [position.coords.latitude, position.coords.longitude] }
+			  url: 'http://23.96.125.188:5000/joinGroup',
+			  data: { "groupCode" : $scope.group.groupCode, "dispName" : $scope.group.dispName, "loc" : [position.coords.latitude, position.coords.longitude] }
 			}).then(function successCallback(response) {
 			    // this callback will be called asynchronously
 			    // when the response is available
-			    console.log(response);
+			    $state.go('joined', { obj : $scope.group });
 			  }, function errorCallback(response) {
 			    // called asynchronously if an error occurs
 			    // or server returns response with an error status.
-			    console.log("in error");
-			    console.log(response);
+			    alert("in error");
 			  });
 
 	      	console.log('Latitude: '          + position.coords.latitude          + '\n' +
@@ -54,23 +54,34 @@ app.controller('CreateGroupController', ['$scope','$http','$state', function($sc
 	}
 
 	$scope.create = function(){
-		$http({
-		  method: 'POST',
-		  url: 'http://23.96.125.188:5000/createGroup',
-		  data: {"groupName" : $scope.group.groupName, "dispName" : $scope.group.dispName, "triggerDist" : $scope.group.triggerDist }
-		}).then(function successCallback(response) {
-		    // this callback will be called asynchronously
-		    // when the response is available
-		    console.log("in success");
-		    console.log(response.data.groupCode);
-		    $scope.group.groupCode = response.data.groupCode;
-		    $state.go('created', { obj : $scope.group });
-		  }, function errorCallback(response) {
-		    // called asynchronously if an error occurs
-		    // or server returns response with an error status.
-		    console.log("in error");
-		    console.log(response);
-		  });
+
+		var options = {};
+
+	   var watchID = navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
+
+	   function onSuccess(position) {
+
+			$http({
+			  method: 'POST',
+			  url: 'http://23.96.125.188:5000/createGroup',
+			  data: {"groupName" : $scope.group.groupName, "dispName" : $scope.group.dispName, "triggerDist" : $scope.group.triggerDist, "loc" : [position.coords.latitude, position.coords.longitude] }
+			}).then(function successCallback(response) {
+			    // this callback will be called asynchronously
+			    // when the response is available
+			    console.log("in success");
+			    console.log(response.data.groupCode);
+			    $scope.group.groupCode = response.data.groupCode;
+			    $state.go('created', { obj : $scope.group });
+			  }, function errorCallback(response) {
+			    // called asynchronously if an error occurs
+			    // or server returns response with an error status.
+			    alert("in error");
+			  });
+		};
+
+	   function onError(error) {
+	      alert('code: '    + error.code    + '\n' +'message: ' + error.message + '\n');
+	   }	
 	}
 
 	
@@ -93,7 +104,7 @@ app.controller('EndGroupController', ['$scope','$http','$state', function($scope
 		    // this callback will be called asynchronously
 		    // when the response is available
 		    console.log("in success");
-		    $state.go('newgroup');
+		    $state.go('home');
 		  }, function errorCallback(response) {
 		    // called asynchronously if an error occurs
 		    // or server returns response with an error status.

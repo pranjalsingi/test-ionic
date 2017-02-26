@@ -25,9 +25,13 @@ app.run(function($ionicPlatform) {
 
 app.config(function($stateProvider, $urlRouterProvider) {
     //console.log($stateProvider);
-    //$urlRouterProvider.otherwise("/");
+    $urlRouterProvider.otherwise("/home");
 
     $stateProvider
+      .state('home', {
+        url: "/home",
+        templateUrl: "templates/home.html"
+      })
       .state('newgroup', {
         url: "/newgroup",
         controller: "CreateGroupController",
@@ -35,12 +39,15 @@ app.config(function($stateProvider, $urlRouterProvider) {
       })
       .state('joingroup',{
         url: "/joingroup",
-        controller: "GeoController",
+        controller: "JoinGroupController",
         templateUrl: "templates/joingroup.html"
       })
       .state('joined',{
         url: "/joined",
         controller: "GroupJoinedController",
+        params: {
+          obj: null
+        },
         templateUrl: "templates/group_joined.html"
       })
       .state('created',{
